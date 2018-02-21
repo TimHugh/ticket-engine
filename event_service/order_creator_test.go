@@ -30,11 +30,7 @@ func TestRejectsDuplicates(t *testing.T) {
 		},
 	}
 
-	order := Order{
-		ID: "order_id",
-	}
-
-	err := orderCreator.Create(order)
+	err := orderCreator.Create("order_id", "location_id")
 	if err == nil {
 		t.Error("Expected duplicate order to fail creating.")
 	}
@@ -52,15 +48,18 @@ func TestStoresValidOrder(t *testing.T) {
 		OrderRepository: mockRepo,
 	}
 
-	order := Order{
-		ID: "order_id",
-	}
+	orderID := "order_id"
+	locationID := "location_id"
 
-	if err := orderCreator.Create(order); err != nil {
+	if err := orderCreator.Create(orderID, locationID); err != nil {
 		t.Error("Expected new order to create successfully.")
 	}
 
-	if mockRepo.Order != order {
-		t.Error("Expected create to store new order in repo.")
+	order := mockRepo.Order
+	if order.ID != orderID {
+		t.Errorf("Expected to create an order with ID %s but found %s", orderID, order.ID)
+	}
+	if order.LocationID != locationID {
+		t.Errorf("Expected to create an order with locationID %s but found %s", locationID, order.LocationID)
 	}
 }

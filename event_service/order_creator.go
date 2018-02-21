@@ -5,25 +5,19 @@ import (
 	"fmt"
 )
 
-type Order struct {
-	ID         string
-	LocationID string
-}
-
-type OrderRepository interface {
-	Store(Order)
-	Find(string) *Order
-}
-
 type OrderCreator struct {
 	OrderRepository OrderRepository
 }
 
-func (o OrderCreator) Create(order Order) error {
-	existingOrder := o.OrderRepository.Find(order.ID)
+func (o OrderCreator) Create(orderID string, LocationID string) error {
+	existingOrder := o.OrderRepository.Find(orderID)
 	if existingOrder != nil {
-		return errors.New(fmt.Sprintf("Couldn't create duplicate order %s.", order.ID))
+		return errors.New(fmt.Sprintf("Couldn't create duplicate order %s.", orderID))
 	}
-	o.OrderRepository.Store(order)
+
+	o.OrderRepository.Store(Order{
+		ID:         orderID,
+		LocationID: LocationID,
+	})
 	return nil
 }
