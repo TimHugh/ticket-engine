@@ -7,26 +7,21 @@ import (
 )
 
 type MockOrderRepository struct {
-	IncludesDuplicate bool
-	Order             Order
+	Order *Order
 }
 
 func (m *MockOrderRepository) Store(order Order) {
-	m.Order = order
+	m.Order = &order
 }
 
 func (m *MockOrderRepository) Find(id string) *Order {
-	if m.IncludesDuplicate {
-		return &Order{}
-	} else {
-		return nil
-	}
+	return m.Order
 }
 
 func TestRejectsDuplicates(t *testing.T) {
 	orderCreator := OrderCreator{
 		&MockOrderRepository{
-			IncludesDuplicate: true,
+			Order: &Order{},
 		},
 	}
 
@@ -40,9 +35,7 @@ func TestRejectsDuplicates(t *testing.T) {
 }
 
 func TestStoresValidOrder(t *testing.T) {
-	mockRepo := &MockOrderRepository{
-		IncludesDuplicate: false,
-	}
+	mockRepo := &MockOrderRepository{}
 
 	orderCreator := OrderCreator{
 		OrderRepository: mockRepo,
@@ -52,7 +45,7 @@ func TestStoresValidOrder(t *testing.T) {
 	locationID := "location_id"
 
 	if err := orderCreator.Create(orderID, locationID); err != nil {
-		t.Error("Expected new order to create successfully.")
+		t.Errorf("Expected successful creation of order but received error: %s", err.Error())
 	}
 
 	order := mockRepo.Order
