@@ -19,66 +19,45 @@ func (m *MockHandler) Handle(event Event) error {
 	return nil
 }
 
-func TestRegistersRoutes(t *testing.T) {
+func TestRegisterRoutes(t *testing.T) {
 	router := NewEventRouter()
 	handler := &MockHandler{Error: false}
-	event := EventType("event")
+	event := Event{
+		Type: "event",
+	}
 
-	router.Register(event, handler)
+	router.Register(event.Type, handler)
+	router.Dispatch(event)
 
-	if router.Routes[event] != handler {
-		t.Error("Expected handler to be registered")
+	if !handler.Handled {
+		t.Error("Expected handler to be registered and called.")
 	}
 }
 
 func TestRejectsUnknownRoutes(t *testing.T) {
-	router := &EventRouter{
-		Routes: RouteList{
-			EventType("known event"): &MockHandler{Error: false},
-		},
+	router := NewEventRouter()
+	event := Event{
+		Type: "event",
 	}
 
-	mockEvent := Event{
-		EventType: EventType("unknown event"),
-	}
+	err := router.Dispatch(event)
 
-	err := router.Dispatch(mockEvent)
 	if err == nil {
 		t.Error("Expected error on dispatching unknown event")
 	}
 }
 
 func DelegatesHandlerErrors(t *testing.T) {
+	router := NewEventRouter()
+	handler := &MockHandler{Error: true}
 	event := Event{
-		EventType: EventType("event"),
+		Type: "event",
 	}
 
-	router := &EventRouter{
-		Routes: RouteList{
-			event.EventType: &MockHandler{Error: true},
-		},
-	}
-
+	router.Register(event.Type, handler)
 	err := router.Dispatch(event)
+
 	if err == nil {
 		t.Error("Expected router to delegate error back from handler")
-	}
-}
-
-func TestDispatchesEvents(t *testing.T) {
-	event := Event{
-		EventType: EventType("event"),
-	}
-
-	handler := MockHandler{Error: false}
-	router := &EventRouter{
-		Routes: RouteList{
-			event.EventType: &handler,
-		},
-	}
-
-	router.Dispatch(event)
-	if handler.Handled != true {
-		t.Error("Expected event to be dispatched to handler.")
 	}
 }
