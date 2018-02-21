@@ -1,4 +1,6 @@
-package event_service
+package repos
+
+import ()
 
 type Location struct {
 	ID           string

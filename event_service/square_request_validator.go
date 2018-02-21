@@ -6,10 +6,12 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+
+	"github.com/timhugh/ticket-engine/lib/repos"
 )
 
 type SquareRequestValidator struct {
-	LocationRepository LocationRepository
+	LocationRepository repos.LocationRepository
 }
 
 func (s SquareRequestValidator) Validate(request Request) error {

@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"fmt"
+
+	"github.com/timhugh/ticket-engine/lib/repos"
 )
 
 const goodSignature = "vsTe0jrY7ypjTdir98ES097hqN0="
@@ -20,7 +22,7 @@ func mockRequest(signature string) Request {
 func TestValidatesSignatureHeader(t *testing.T) {
 	validator := SquareRequestValidator{
 		LocationRepository: &MockLocationRepository{
-			Location: &Location{
+			Location: &repos.Location{
 				ID:           "location_id",
 				SignatureKey: "test_key",
 			},
@@ -45,7 +47,7 @@ func TestValidatesSignatureHeader(t *testing.T) {
 func TestValidatesLocation(t *testing.T) {
 	validator := SquareRequestValidator{
 		LocationRepository: &MockLocationRepository{
-			Location: &Location{
+			Location: &repos.Location{
 				SignatureKey: "test_key",
 			},
 		},

@@ -2,17 +2,19 @@ package event_service
 
 import (
 	"testing"
+
+	"github.com/timhugh/ticket-engine/lib/repos"
 )
 
 type MockLocationRepository struct {
-	Location *Location
+	Location *repos.Location
 }
 
-func (m *MockLocationRepository) Find(locationID string) *Location {
+func (m *MockLocationRepository) Find(locationID string) *repos.Location {
 	return m.Location
 }
 
-func (m *MockLocationRepository) Store(location Location) {
+func (m *MockLocationRepository) Store(location repos.Location) {
 	m.Location = &location
 }
 
@@ -39,7 +41,7 @@ func TestCreatesNewOrders(t *testing.T) {
 		LocationID: "location_id",
 	}
 	locationRepo := &MockLocationRepository{
-		Location: &Location{
+		Location: &repos.Location{
 			ID: event.LocationID,
 		},
 	}
