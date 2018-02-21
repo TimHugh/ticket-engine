@@ -2,37 +2,7 @@ package event_service
 
 import (
 	"testing"
-
-	"github.com/timhugh/ticket-engine/lib/repos"
 )
-
-type MockLocationRepository struct {
-	Location *repos.Location
-}
-
-func (m *MockLocationRepository) Find(locationID string) *repos.Location {
-	return m.Location
-}
-
-func (m *MockLocationRepository) Store(location repos.Location) {
-	m.Location = &location
-}
-
-func TestRejectsUnknownLocations(t *testing.T) {
-	locationRepo := &MockLocationRepository{}
-	event := Event{
-		LocationID: "location_id",
-	}
-
-	handler := PaymentUpdateHandler{
-		LocationRepository: locationRepo,
-	}
-
-	err := handler.Handle(event)
-	if err == nil {
-		t.Error("Expected exception for unknown location")
-	}
-}
 
 func TestCreatesNewOrders(t *testing.T) {
 	orderRepo := &MockOrderRepository{}
@@ -40,17 +10,11 @@ func TestCreatesNewOrders(t *testing.T) {
 		OrderID:    "order_id",
 		LocationID: "location_id",
 	}
-	locationRepo := &MockLocationRepository{
-		Location: &repos.Location{
-			ID: event.LocationID,
-		},
-	}
 
 	handler := PaymentUpdateHandler{
 		OrderCreator: OrderCreator{
 			OrderRepository: orderRepo,
 		},
-		LocationRepository: locationRepo,
 	}
 
 	err := handler.Handle(event)
