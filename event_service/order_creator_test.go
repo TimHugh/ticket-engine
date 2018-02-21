@@ -5,25 +5,25 @@ import (
 
 	"strings"
 
-	"github.com/timhugh/ticket-engine/lib/repos"
+	"github.com/timhugh/ticket-engine/common"
 )
 
 type MockOrderRepository struct {
-	Order *repos.Order
+	Order *common.Order
 }
 
-func (m *MockOrderRepository) Store(order repos.Order) {
+func (m *MockOrderRepository) Store(order common.Order) {
 	m.Order = &order
 }
 
-func (m *MockOrderRepository) Find(id string) *repos.Order {
+func (m *MockOrderRepository) Find(id string) *common.Order {
 	return m.Order
 }
 
 func TestRejectsDuplicates(t *testing.T) {
 	orderCreator := OrderCreator{
 		&MockOrderRepository{
-			Order: &repos.Order{},
+			Order: &common.Order{},
 		},
 	}
 

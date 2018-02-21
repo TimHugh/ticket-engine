@@ -7,11 +7,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/timhugh/ticket-engine/lib/repos"
+	"github.com/timhugh/ticket-engine/common"
 )
 
 type SquareRequestValidator struct {
-	LocationRepository repos.LocationRepository
+	LocationRepository common.LocationRepository
 }
 
 func (s SquareRequestValidator) Validate(request Request) error {

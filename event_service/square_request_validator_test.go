@@ -5,8 +5,20 @@ import (
 
 	"fmt"
 
-	"github.com/timhugh/ticket-engine/lib/repos"
+	"github.com/timhugh/ticket-engine/common"
 )
+
+type MockLocationRepository struct {
+	Location *common.Location
+}
+
+func (m *MockLocationRepository) Find(locationID string) *common.Location {
+	return m.Location
+}
+
+func (m *MockLocationRepository) Store(location common.Location) {
+	m.Location = &location
+}
 
 const goodSignature = "vsTe0jrY7ypjTdir98ES097hqN0="
 
@@ -22,7 +34,7 @@ func mockRequest(signature string) Request {
 func TestValidatesSignatureHeader(t *testing.T) {
 	validator := SquareRequestValidator{
 		LocationRepository: &MockLocationRepository{
-			Location: &repos.Location{
+			Location: &common.Location{
 				ID:           "location_id",
 				SignatureKey: "test_key",
 			},
@@ -47,7 +59,7 @@ func TestValidatesSignatureHeader(t *testing.T) {
 func TestValidatesLocation(t *testing.T) {
 	validator := SquareRequestValidator{
 		LocationRepository: &MockLocationRepository{
-			Location: &repos.Location{
+			Location: &common.Location{
 				SignatureKey: "test_key",
 			},
 		},

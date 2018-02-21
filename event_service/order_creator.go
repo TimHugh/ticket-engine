@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/timhugh/ticket-engine/lib/repos"
+	"github.com/timhugh/ticket-engine/common"
 )
 
 type OrderCreator struct {
-	OrderRepository repos.OrderRepository
+	OrderRepository common.OrderRepository
 }
 
 func (o OrderCreator) Create(orderID string, LocationID string) error {
@@ -17,7 +17,7 @@ func (o OrderCreator) Create(orderID string, LocationID string) error {
 		return errors.New(fmt.Sprintf("Couldn't create duplicate order %s.", orderID))
 	}
 
-	o.OrderRepository.Store(repos.Order{
+	o.OrderRepository.Store(common.Order{
 		ID:         orderID,
 		LocationID: LocationID,
 	})
