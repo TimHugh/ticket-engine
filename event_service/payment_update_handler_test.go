@@ -2,25 +2,25 @@ package main
 
 import (
 	"testing"
+
+	"github.com/timhugh/ticket-engine/common"
 )
 
 func TestCreatesNewOrders(t *testing.T) {
-	orderRepo := &MockOrderRepository{}
+	orderRepo := common.NewInMemoryOrderRepository()
 	event := Event{
 		OrderID:    "order_id",
 		LocationID: "location_id",
 	}
 
-	handler := PaymentUpdateHandler{
-		OrderCreator{orderRepo},
-	}
+	handler := NewPaymentUpdateHandler(orderRepo)
 
 	err := handler.Handle(event)
 	if err != nil {
 		t.Error("Expected to successfully create a new order.")
 	}
 
-	order := orderRepo.Order
+	order := orderRepo.Find("order_id")
 	if order.ID != event.OrderID {
 		t.Errorf("Expected new order with ID %s but got %s", event.OrderID, order.ID)
 	}

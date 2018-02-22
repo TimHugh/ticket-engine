@@ -17,7 +17,18 @@ type SquareRequestProcessor struct {
 	eventRouter EventRouter
 }
 
-func (proc SquareRequestProcessor) Process(req *http.Request) error {
+func NewSquareRequestProcessor(eventRouter EventRouter) RequestProcessor {
+	return &SquareRequestProcessor{
+		validators:  make([]RequestValidator, 1),
+		eventRouter: eventRouter,
+	}
+}
+
+func (proc *SquareRequestProcessor) AddValidator(validator RequestValidator) {
+	proc.validators = append(proc.validators, validator)
+}
+
+func (proc *SquareRequestProcessor) Process(req *http.Request) error {
 	event, err := proc.serializeEvent(req)
 	if err != nil {
 		return err
@@ -31,7 +42,7 @@ func (proc SquareRequestProcessor) Process(req *http.Request) error {
 	return proc.eventRouter.Dispatch(event)
 }
 
-func (proc SquareRequestProcessor) validate(req SquareRequest) error {
+func (proc *SquareRequestProcessor) validate(req SquareRequest) error {
 	for _, validator := range proc.validators {
 		if err := validator.Validate(req); err != nil {
 			return err
@@ -40,7 +51,7 @@ func (proc SquareRequestProcessor) validate(req SquareRequest) error {
 	return nil
 }
 
-func (proc SquareRequestProcessor) serializeEvent(req *http.Request) (Event, error) {
+func (proc *SquareRequestProcessor) serializeEvent(req *http.Request) (Event, error) {
 	var event Event
 	buf := proc.cloneBody(req)
 	body, _ := ioutil.ReadAll(buf)
@@ -48,7 +59,7 @@ func (proc SquareRequestProcessor) serializeEvent(req *http.Request) (Event, err
 	return event, err
 }
 
-func (proc SquareRequestProcessor) serializeRequest(req *http.Request, event Event) SquareRequest {
+func (proc *SquareRequestProcessor) serializeRequest(req *http.Request, event Event) SquareRequest {
 	buf := proc.cloneBody(req)
 	body, _ := ioutil.ReadAll(buf)
 	return SquareRequest{
@@ -59,7 +70,7 @@ func (proc SquareRequestProcessor) serializeRequest(req *http.Request, event Eve
 	}
 }
 
-func (proc SquareRequestProcessor) cloneBody(req *http.Request) io.ReadCloser {
+func (proc *SquareRequestProcessor) cloneBody(req *http.Request) io.ReadCloser {
 	buf, _ := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(buf))
 	return ioutil.NopCloser(bytes.NewBuffer(buf))

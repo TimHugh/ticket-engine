@@ -14,27 +14,23 @@ func main() {
 	orderRepository := common.NewInMemoryOrderRepository()
 	locationRepository := common.NewInMemoryLocationRepository()
 
-	requestProcessor := SquareRequestProcessor{
-		validators: []RequestValidator{
-			SquareRequestValidator{locationRepository},
-		},
-		eventRouter: EventRouter{
-			routes: RouteList{
-				"PAYMENT_UPDATED": PaymentUpdateHandler{
-					OrderCreator{orderRepository},
-				},
-			},
-		},
-	}
+	eventRouter := NewEventRouter()
+	eventRouter.Register("PAYMENT_UPDATED", NewPaymentUpdateHandler(orderRepository))
+
+	requestProcessor := NewSquareRequestProcessor(eventRouter)
+	requestProcessor.AddValidator(SquareRequestValidator{locationRepository})
 
 	router := mux.NewRouter()
 	router.HandleFunc("/event", eventHandler(requestProcessor))
+
 	n := negroni.Classic()
 	n.UseHandler(router)
+
 	http.ListenAndServe(":8080", n)
 }
 
 type RequestProcessor interface {
+	AddValidator(RequestValidator)
 	Process(*http.Request) error
 }
 

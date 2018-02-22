@@ -21,11 +21,10 @@ type EventRouter struct {
 	routes RouteList
 }
 
-func NewEventRouter() *EventRouter {
-	router := EventRouter{
+func NewEventRouter() EventRouter {
+	return EventRouter{
 		routes: make(RouteList),
 	}
-	return &router
 }
 
 func (e EventRouter) Register(event string, handler EventHandler) {
