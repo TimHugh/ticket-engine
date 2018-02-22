@@ -1,4 +1,4 @@
-package event_service
+package main
 
 import (
 	"testing"
@@ -23,7 +23,7 @@ func (m *MockOrderRepository) Find(id string) *common.Order {
 func TestRejectsDuplicates(t *testing.T) {
 	orderCreator := OrderCreator{
 		&MockOrderRepository{
-			Order: &common.Order{},
+			&common.Order{},
 		},
 	}
 
@@ -38,10 +38,7 @@ func TestRejectsDuplicates(t *testing.T) {
 
 func TestStoresValidOrder(t *testing.T) {
 	mockRepo := &MockOrderRepository{}
-
-	orderCreator := OrderCreator{
-		OrderRepository: mockRepo,
-	}
+	orderCreator := OrderCreator{mockRepo}
 
 	orderID := "order_id"
 	locationID := "location_id"

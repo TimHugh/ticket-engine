@@ -1,4 +1,4 @@
-package event_service
+package main
 
 import (
 	"crypto/hmac"
@@ -11,11 +11,11 @@ import (
 )
 
 type SquareRequestValidator struct {
-	LocationRepository common.LocationRepository
+	locationRepository common.LocationRepository
 }
 
 func (s SquareRequestValidator) Validate(request Request) error {
-	location := s.LocationRepository.Find(request.LocationID)
+	location := s.locationRepository.Find(request.LocationID)
 	if location == nil {
 		return errors.New(fmt.Sprintf("Received request for unknown location: %s.", request.LocationID))
 	}

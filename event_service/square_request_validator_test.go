@@ -1,4 +1,4 @@
-package event_service
+package main
 
 import (
 	"testing"
@@ -33,7 +33,7 @@ func mockRequest(signature string) Request {
 
 func TestValidatesSignatureHeader(t *testing.T) {
 	validator := SquareRequestValidator{
-		LocationRepository: &MockLocationRepository{
+		locationRepository: &MockLocationRepository{
 			Location: &common.Location{
 				ID:           "location_id",
 				SignatureKey: "test_key",
@@ -58,7 +58,7 @@ func TestValidatesSignatureHeader(t *testing.T) {
 
 func TestValidatesLocation(t *testing.T) {
 	validator := SquareRequestValidator{
-		LocationRepository: &MockLocationRepository{
+		locationRepository: &MockLocationRepository{
 			Location: &common.Location{
 				SignatureKey: "test_key",
 			},
@@ -72,7 +72,7 @@ func TestValidatesLocation(t *testing.T) {
 	}
 
 	validator = SquareRequestValidator{
-		LocationRepository: &MockLocationRepository{},
+		locationRepository: &MockLocationRepository{},
 	}
 
 	request = mockRequest("/8sKiBs8HSiamqGkG2vSHOopv+w=")

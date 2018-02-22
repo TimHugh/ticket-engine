@@ -1,4 +1,4 @@
-package event_service
+package main
 
 import (
 	"errors"
@@ -6,9 +6,9 @@ import (
 )
 
 type Event struct {
-	OrderID    string
-	Type       string
-	LocationID string
+	OrderID    string `json:"entity_id"`
+	Type       string `json:"event_type"`
+	LocationID string `json:"merchant_id"`
 }
 
 type EventHandler interface {

@@ -13,5 +13,5 @@ func (m *MockOrderRepository) Store(order Order) {
 }
 
 func (m *MockOrderRepository) Find(id string) *Order {
-	return m.Order
+	return &m.Order
 }

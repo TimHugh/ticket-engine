@@ -1,11 +1,11 @@
-package event_service
+package main
 
 import ()
 
 type PaymentUpdateHandler struct {
-	OrderCreator OrderCreator
+	orderCreator OrderCreator
 }
 
 func (p PaymentUpdateHandler) Handle(event Event) error {
-	return p.OrderCreator.Create(event.OrderID, event.LocationID)
+	return p.orderCreator.Create(event.OrderID, event.LocationID)
 }

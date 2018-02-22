@@ -1,4 +1,4 @@
-package event_service
+package main
 
 import (
 	"testing"
@@ -12,9 +12,7 @@ func TestCreatesNewOrders(t *testing.T) {
 	}
 
 	handler := PaymentUpdateHandler{
-		OrderCreator: OrderCreator{
-			OrderRepository: orderRepo,
-		},
+		OrderCreator{orderRepo},
 	}
 
 	err := handler.Handle(event)

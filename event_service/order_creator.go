@@ -1,4 +1,4 @@
-package event_service
+package main
 
 import (
 	"errors"
@@ -8,18 +8,19 @@ import (
 )
 
 type OrderCreator struct {
-	OrderRepository common.OrderRepository
+	orderRepository common.OrderRepository
 }
 
 func (o OrderCreator) Create(orderID string, LocationID string) error {
-	existingOrder := o.OrderRepository.Find(orderID)
+	existingOrder := o.orderRepository.Find(orderID)
 	if existingOrder != nil {
 		return errors.New(fmt.Sprintf("Couldn't create duplicate order %s.", orderID))
 	}
 
-	o.OrderRepository.Store(common.Order{
+	o.orderRepository.Store(common.Order{
 		ID:         orderID,
 		LocationID: LocationID,
 	})
+
 	return nil
 }
