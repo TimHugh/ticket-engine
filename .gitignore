@@ -1,4 +1,4 @@
-gorm.db
-ticket-engine
 .env
 .DS_Store
+
+event_service/event_service

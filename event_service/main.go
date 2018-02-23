@@ -1,14 +1,34 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/unrolled/render"
 	"github.com/urfave/negroni"
 
+	_ "github.com/joho/godotenv/autoload"
+	"github.com/newrelic/go-agent"
+	"github.com/stvp/rollbar"
+
 	"github.com/timhugh/ticket-engine/common"
 )
+
+var config = map[string]string{
+	"environment":    os.Getenv("ENVIRONMENT"),
+	"port":           os.Getenv("PORT"),
+	"newrelic_token": os.Getenv("NEW_RELIC_TOKEN"),
+	"newrelic_app":   os.Getenv("NEW_RELIC_APP_NAME"),
+	"rollbar_token":  os.Getenv("ROLLBAR_TOKEN"),
+}
+
+type RequestProcessor interface {
+	AddValidator(RequestValidator)
+	Process(*http.Request) error
+}
 
 func main() {
 	orderRepository := common.NewInMemoryOrderRepository()
@@ -20,18 +40,34 @@ func main() {
 	requestProcessor := NewSquareRequestProcessor(eventRouter)
 	requestProcessor.AddValidator(SquareRequestValidator{locationRepository})
 
+	initRollbar(config["rollbar_token"], config["environment"])
+
+	nrApp := initNewRelic(config["newrelic_token"], config["newrelic_app"])
+
 	router := mux.NewRouter()
-	router.HandleFunc("/event", eventHandler(requestProcessor))
+	router.HandleFunc(newrelic.WrapHandleFunc(nrApp, "/event", eventHandler(requestProcessor)))
 
 	n := negroni.Classic()
 	n.UseHandler(router)
 
-	http.ListenAndServe(":8080", n)
+	err := http.ListenAndServe(fmt.Sprintf(":%s", config["port"]), n)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-type RequestProcessor interface {
-	AddValidator(RequestValidator)
-	Process(*http.Request) error
+func initNewRelic(token string, appName string) newrelic.Application {
+	config := newrelic.NewConfig(appName, token)
+	app, err := newrelic.NewApplication(config)
+	if err != nil {
+		log.Fatal("Unable to initialize NewRelic reporting.")
+	}
+	return app
+}
+
+func initRollbar(token string, environment string) {
+	rollbar.Environment = environment
+	rollbar.Token = token
 }
 
 type JSON map[string]string
@@ -39,16 +75,26 @@ type JSON map[string]string
 func eventHandler(processor RequestProcessor) http.HandlerFunc {
 	r := render.New()
 
+	ok := func(w http.ResponseWriter) {
+		r.JSON(w, http.StatusOK, JSON{
+			"status": "OK",
+		})
+	}
+
+	unprocessable := func(w http.ResponseWriter) {
+		r.JSON(w, http.StatusUnprocessableEntity, JSON{
+			"error": "unable to process",
+		})
+	}
+
 	return func(w http.ResponseWriter, req *http.Request) {
-		err := processor.Process(req)
-		if err != nil {
-			r.JSON(w, http.StatusUnprocessableEntity, JSON{
-				"error": "unable to process",
-			})
+		if req.Method != "POST" {
+			unprocessable(w)
+		} else if err := processor.Process(req); err != nil {
+			rollbar.Error(rollbar.ERR, err)
+			unprocessable(w)
 		} else {
-			r.JSON(w, http.StatusOK, JSON{
-				"status": "OK",
-			})
+			ok(w)
 		}
 	}
 }
