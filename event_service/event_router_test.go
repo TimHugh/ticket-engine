@@ -38,7 +38,7 @@ func TestRouting(t *testing.T) {
 
 	unknownEvent := Event{Type: "unknown_event"}
 	err = router.Dispatch(unknownEvent)
-	if err == nil || !strings.Contains(err.Error(), "unknown") {
+	if err == nil || !strings.Contains(err.Error(), "unknown event type") {
 		t.Errorf("Expected unknown event error")
 	}
 

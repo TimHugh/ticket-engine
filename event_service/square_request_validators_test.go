@@ -12,10 +12,12 @@ const goodSignature = "vsTe0jrY7ypjTdir98ES097hqN0="
 
 func mockRequest(signature string, location_id string) SquareRequest {
 	return SquareRequest{
-		Body:       `{"event": "test"}`,
-		Signature:  signature,
-		LocationID: location_id,
-		URL:        "http://www.example.com/event",
+		Body:      `{"event": "test"}`,
+		Signature: signature,
+		URL:       "http://www.example.com/event",
+		Event: Event{
+			LocationID: location_id,
+		},
 	}
 }
 

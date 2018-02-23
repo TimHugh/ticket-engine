@@ -19,7 +19,7 @@ type SquareRequestProcessor struct {
 
 func NewSquareRequestProcessor(eventRouter EventRouter) RequestProcessor {
 	return &SquareRequestProcessor{
-		validators:  make([]RequestValidator, 1),
+		validators:  []RequestValidator{},
 		eventRouter: eventRouter,
 	}
 }
@@ -28,18 +28,12 @@ func (proc *SquareRequestProcessor) AddValidator(validator RequestValidator) {
 	proc.validators = append(proc.validators, validator)
 }
 
-func (proc *SquareRequestProcessor) Process(req *http.Request) error {
-	event, err := proc.serializeEvent(req)
-	if err != nil {
-		return err
-	}
-
-	squareRequest := proc.serializeRequest(req, event)
+func (proc *SquareRequestProcessor) Process(r *http.Request) error {
+	squareRequest := proc.serializeRequest(r)
 	if err := proc.validate(squareRequest); err != nil {
 		return err
 	}
-
-	return proc.eventRouter.Dispatch(event)
+	return proc.eventRouter.Dispatch(squareRequest.Event)
 }
 
 func (proc *SquareRequestProcessor) validate(req SquareRequest) error {
@@ -51,22 +45,21 @@ func (proc *SquareRequestProcessor) validate(req SquareRequest) error {
 	return nil
 }
 
-func (proc *SquareRequestProcessor) serializeEvent(req *http.Request) (Event, error) {
+func (proc *SquareRequestProcessor) parseEvent(body []byte) Event {
 	var event Event
-	buf := proc.cloneBody(req)
-	body, _ := ioutil.ReadAll(buf)
-	err := json.Unmarshal(body, &event)
-	return event, err
+	json.Unmarshal(body, &event)
+	return event
 }
 
-func (proc *SquareRequestProcessor) serializeRequest(req *http.Request, event Event) SquareRequest {
+func (proc *SquareRequestProcessor) serializeRequest(req *http.Request) SquareRequest {
 	buf := proc.cloneBody(req)
 	body, _ := ioutil.ReadAll(buf)
+
 	return SquareRequest{
-		URL:        "https://" + req.Host + req.URL.Path,
-		Body:       string(body),
-		Signature:  req.Header.Get("X-Square-Signature"),
-		LocationID: event.LocationID,
+		URL:       "https://" + req.Host + req.URL.Path,
+		Body:      string(body),
+		Signature: req.Header.Get("X-Square-Signature"),
+		Event:     proc.parseEvent(body),
 	}
 }
 

@@ -34,7 +34,7 @@ func (e EventRouter) Register(event string, handler EventHandler) {
 func (e EventRouter) Dispatch(event Event) error {
 	handler, exists := e.routes[event.Type]
 	if !exists {
-		return errors.New(fmt.Sprintf("No route registered for event %s", event.Type))
+		return errors.New(fmt.Sprintf("Recieved unknown event type '%s'", event.Type))
 	}
 	return handler.Handle(event)
 }

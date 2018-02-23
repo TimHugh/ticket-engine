@@ -11,10 +11,10 @@ import (
 )
 
 type SquareRequest struct {
-	Body       string
-	Signature  string
-	LocationID string
-	URL        string
+	Body      string
+	Signature string
+	URL       string
+	Event     Event
 }
 
 type SquareRequestValidator struct {
@@ -22,9 +22,9 @@ type SquareRequestValidator struct {
 }
 
 func (s SquareRequestValidator) Validate(req SquareRequest) error {
-	location := s.locationRepository.Find(req.LocationID)
+	location := s.locationRepository.Find(req.Event.LocationID)
 	if location == nil {
-		return errors.New(fmt.Sprintf("Received request for unknown location: %s.", req.LocationID))
+		return errors.New(fmt.Sprintf("Received request for unknown location: %s.", req.Event.LocationID))
 	}
 	if !s.verifySignature(req.URL, location.SignatureKey, req.Body, req.Signature) {
 		return errors.New("Request failed signature validation")
