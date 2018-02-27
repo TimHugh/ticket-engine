@@ -72,13 +72,9 @@ func (q MongoQuery) One(result interface{}) error {
 	return q.Query.One(result)
 }
 
-// MongoAdapter fulfills Adapter interface
-func NewMongoAdapter(host string, database string) (Adapter, error) {
-	if session, err := NewMongoSession(host); err != nil {
-		return nil, err
-	} else {
-		return &MongoAdapter{session, database}, nil
-	}
+// MongoAdapter satisfies Adapter interface
+func NewMongoAdapter(session Session, database string) Adapter {
+	return &MongoAdapter{session, database}
 }
 
 type MongoAdapter struct {
@@ -90,14 +86,18 @@ func (a *MongoAdapter) db() DataLayer {
 	return a.session.DB(a.database)
 }
 
-func (a *MongoAdapter) Find(collection string, id string) (*Document, error) {
-	c := a.db().C(collection)
-	doc := &Document{}
-	err := c.Find(bson.M{"id": id}).One(doc)
-	return doc, err
+func (a *MongoAdapter) Close() {
+	a.session.Close()
 }
 
-func (a *MongoAdapter) Create(collection string, doc *Document) error {
+func (a *MongoAdapter) Find(collection string, id string) (*struct{}, error) {
+	c := a.db().C(collection)
+	var doc struct{}
+	err := c.Find(bson.M{"id": id}).One(&doc)
+	return &doc, err
+}
+
+func (a *MongoAdapter) Create(collection string, doc *struct{}) error {
 	c := a.db().C(collection)
 	return c.Insert(doc)
 }
