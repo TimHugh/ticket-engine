@@ -2,12 +2,12 @@ package common
 
 import (
 	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // MongoSession wraps mgo.Session
 type Session interface {
 	DB(name string) DataLayer
+	Clone() Session
 	Close()
 }
 
@@ -22,6 +22,10 @@ type MongoSession struct {
 
 func (s MongoSession) DB(name string) DataLayer {
 	return MongoDatabase{s.Session.DB(name)}
+}
+
+func (s MongoSession) Clone() Session {
+	return MongoSession{s.Session.Clone()}
 }
 
 func (s MongoSession) Close() {
@@ -70,34 +74,4 @@ type MongoQuery struct {
 
 func (q MongoQuery) One(result interface{}) error {
 	return q.Query.One(result)
-}
-
-// MongoAdapter satisfies Adapter interface
-func NewMongoAdapter(session Session, database string) Adapter {
-	return &MongoAdapter{session, database}
-}
-
-type MongoAdapter struct {
-	session  Session
-	database string
-}
-
-func (a *MongoAdapter) db() DataLayer {
-	return a.session.DB(a.database)
-}
-
-func (a *MongoAdapter) Close() {
-	a.session.Close()
-}
-
-func (a *MongoAdapter) Find(collection string, id string) (*struct{}, error) {
-	c := a.db().C(collection)
-	var doc struct{}
-	err := c.Find(bson.M{"id": id}).One(&doc)
-	return &doc, err
-}
-
-func (a *MongoAdapter) Create(collection string, doc *struct{}) error {
-	c := a.db().C(collection)
-	return c.Insert(doc)
 }

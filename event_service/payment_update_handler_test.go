@@ -20,7 +20,10 @@ func TestCreatesNewOrders(t *testing.T) {
 		t.Error("Expected to successfully create a new order.")
 	}
 
-	order := orderRepo.Find("order_id")
+	order, err := orderRepo.Find("order_id")
+	if err != nil {
+		t.Error("Expected to successfully find order")
+	}
 	if order.ID != event.OrderID {
 		t.Errorf("Expected new order with ID %s but got %s", event.OrderID, order.ID)
 	}

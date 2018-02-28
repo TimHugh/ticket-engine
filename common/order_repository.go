@@ -8,6 +8,6 @@ type Order struct {
 }
 
 type OrderRepository interface {
-	Store(Order)
-	Find(string) *Order
+	Store(Order) error
+	Find(string) (*Order, error)
 }

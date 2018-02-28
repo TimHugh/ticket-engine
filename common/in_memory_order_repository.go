@@ -1,6 +1,8 @@
 package common
 
-import ()
+import (
+	"errors"
+)
 
 type InMemoryOrderRepository struct {
 	memoryStore map[string]Order
@@ -12,14 +14,15 @@ func NewInMemoryOrderRepository() OrderRepository {
 	}
 }
 
-func (repo *InMemoryOrderRepository) Find(id string) *Order {
+func (repo *InMemoryOrderRepository) Find(id string) (*Order, error) {
 	order := repo.memoryStore[id]
 	if order.ID == "" {
-		return nil
+		return nil, errors.New("Order does not exist")
 	}
-	return &order
+	return &order, nil
 }
 
-func (repo *InMemoryOrderRepository) Store(order Order) {
+func (repo *InMemoryOrderRepository) Store(order Order) error {
 	repo.memoryStore[order.ID] = order
+	return nil
 }

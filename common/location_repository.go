@@ -8,6 +8,6 @@ type Location struct {
 }
 
 type LocationRepository interface {
-	Find(string) *Location
-	Store(Location)
+	Find(string) (*Location, error)
+	Store(Location) error
 }

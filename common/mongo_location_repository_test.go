@@ -10,7 +10,11 @@ func (s MockSession) DB(name string) DataLayer {
 	return &MockDataLayer{}
 }
 
-func (s *MockSession) Close() {}
+func (s MockSession) Clone() Session {
+	return s
+}
+
+func (s MockSession) Close() {}
 
 type MockDataLayer struct{}
 
@@ -36,24 +40,19 @@ type MockQuery struct {
 }
 
 func (q *MockQuery) One(result interface{}) error {
-	result = Result{Data: "result"}
+	result.(*Location).SignatureKey = "test key"
 	return nil
 }
 
-type Result struct {
-	Data string
-}
+func TestRepository(t *testing.T) {
+	session := MockSession{}
+	repo := NewMongoLocationRepository(session, "test_database")
 
-func TestAdapter(t *testing.T) {
-	session := &MockSession{}
-	adapter := NewMongoAdapter(session, "test_database")
-
-	doc, err := adapter.Find("collection", "query")
+	location, err := repo.Find("id")
 	if err != nil {
 		t.Error("Expected to find without error")
 	}
-	doc = Result(*doc)
-	if doc.Data != "result" {
-		t.Error("Expected to retrieve mock record 'result'")
+	if location.SignatureKey != "test key" {
+		t.Errorf("Expected to receive mock record")
 	}
 }

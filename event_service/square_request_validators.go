@@ -22,7 +22,10 @@ type SquareRequestValidator struct {
 }
 
 func (s SquareRequestValidator) Validate(req SquareRequest) error {
-	location := s.locationRepository.Find(req.Event.LocationID)
+	location, err := s.locationRepository.Find(req.Event.LocationID)
+	if err != nil {
+		return err
+	}
 	if location == nil {
 		return errors.New(fmt.Sprintf("Received request for unknown location: %s.", req.Event.LocationID))
 	}
