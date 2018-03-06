@@ -25,7 +25,6 @@ type locationRepository struct {
 func (r locationRepository) Find(id string) (Location, error) {
 	var loc Location
 	err := r.adapter.Find("locations", id, &loc)
-	fmt.Println("in repo#find, loc:", loc)
 	return loc, err
 }
 

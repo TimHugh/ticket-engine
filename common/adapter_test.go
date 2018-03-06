@@ -1,6 +1,8 @@
 package common
 
-import ()
+import (
+	"fmt"
+)
 
 func NewMockAdapter() Adapter {
 	return &MockAdapter{}
@@ -10,12 +12,17 @@ type MockAdapter struct {
 	doc Document
 }
 
-func (a *MockAdapter) Find(collection string, id string, result *interface{}) error {
+func (a *MockAdapter) Find(collection string, id string, result interface{}) error {
 	switch result.(type) {
 	case *Location:
-		*result = Location{ID: id}
+		value := result.(*Location)
+		value.ID = id
+		value.SignatureKey = "signature"
 	case *Order:
-		*result = Order{ID: id}
+		value := result.(*Order)
+		value.ID = id
+	default:
+		return fmt.Errorf("Received unknown type %T", result)
 	}
 	return nil
 }

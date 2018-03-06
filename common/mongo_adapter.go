@@ -21,7 +21,7 @@ func (m MongoAdapter) collection(name string) (Session, Collection) {
 	return session, collection
 }
 
-func (m MongoAdapter) Find(collection_name string, id string, result *interface{}) error {
+func (m MongoAdapter) Find(collection_name string, id string, result interface{}) error {
 	session, collection := m.collection(collection_name)
 	defer session.Close()
 
