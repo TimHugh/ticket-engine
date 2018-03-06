@@ -8,15 +8,15 @@ type Order struct {
 }
 
 type OrderRepository struct {
-	adapter Adapter
+	Adapter Adapter
 }
 
 func (r OrderRepository) Find(id string) (Order, error) {
 	var order Order
-	err := r.adapter.Find("orders", id, &order)
+	err := r.Adapter.Find("orders", id, &order)
 	return order, err
 }
 
 func (r OrderRepository) Store(order Order) error {
-	return r.adapter.Create("orders", order)
+	return r.Adapter.Create("orders", order)
 }
