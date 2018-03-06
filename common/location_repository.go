@@ -11,10 +11,10 @@ type LocationRepository struct {
 	Adapter Adapter
 }
 
-func (r LocationRepository) Find(id string) (Location, error) {
+func (r LocationRepository) Find(id string) (*Location, error) {
 	var loc Location
 	err := r.Adapter.Find("locations", id, &loc)
-	return loc, err
+	return &loc, err
 }
 
 func (r LocationRepository) Store(loc Location) error {

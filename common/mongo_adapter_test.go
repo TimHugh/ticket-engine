@@ -47,7 +47,7 @@ type MockDocument struct {
 
 func TestAdapter(t *testing.T) {
 	session := MockSession{}
-	adapter := MongoAdapter{session, "test_database"}
+	adapter := MongoAdapter{session}
 
 	doc := MockDocument{
 		ID:    "id",

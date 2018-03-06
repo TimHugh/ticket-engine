@@ -6,18 +6,18 @@ import (
 )
 
 // MongoAdapter satisfies Adapter interface
-func NewMongoAdapter(session Session, database_name string) Adapter {
-	return MongoAdapter{session, database_name}
+func NewMongoAdapter(host_uri string) (Adapter, error) {
+	session, err := NewMongoSession(host_uri)
+	return MongoAdapter{session}, err
 }
 
 type MongoAdapter struct {
-	session       Session
-	database_name string
+	session Session
 }
 
 func (m MongoAdapter) collection(name string) (Session, Collection) {
 	session := m.session.Clone()
-	collection := session.DB(m.database_name).C(name)
+	collection := session.DB("").C(name)
 	return session, collection
 }
 
