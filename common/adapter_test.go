@@ -9,18 +9,15 @@ func NewMockAdapter() Adapter {
 }
 
 type MockAdapter struct {
-	doc Document
+	Doc interface{}
 }
 
 func (a *MockAdapter) Find(collection string, id string, result interface{}) error {
-	switch result.(type) {
+	switch value := result.(type) {
 	case *Location:
-		value := result.(*Location)
-		value.ID = id
-		value.SignatureKey = "signature"
+		*value = a.Doc.(Location)
 	case *Order:
-		value := result.(*Order)
-		value.ID = id
+		*value = a.Doc.(Order)
 	default:
 		return fmt.Errorf("Received unknown type %T", result)
 	}
@@ -28,7 +25,7 @@ func (a *MockAdapter) Find(collection string, id string, result interface{}) err
 }
 
 func (a *MockAdapter) Create(collection string, doc interface{}) error {
-	a.doc = doc.(Document)
+	a.Doc = doc
 	return nil
 }
 

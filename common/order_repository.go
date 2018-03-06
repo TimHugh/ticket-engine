@@ -7,7 +7,16 @@ type Order struct {
 	LocationID string
 }
 
-type OrderRepository interface {
-	Store(Order) error
-	Find(string) (*Order, error)
+type OrderRepository struct {
+	adapter Adapter
+}
+
+func (r OrderRepository) Find(id string) (Order, error) {
+	var order Order
+	err := r.adapter.Find("orders", id, &order)
+	return order, err
+}
+
+func (r OrderRepository) Store(order Order) error {
+	return r.adapter.Create("orders", order)
 }

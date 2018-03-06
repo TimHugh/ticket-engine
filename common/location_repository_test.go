@@ -6,7 +6,7 @@ import (
 
 func TestLocationRepo(t *testing.T) {
 	adapter := NewMockAdapter()
-	repo := NewLocationRepository(adapter)
+	repo := LocationRepository{adapter}
 
 	newLoc := Location{
 		ID:           "id",
