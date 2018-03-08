@@ -95,7 +95,7 @@ func (c MongoCollection) Find(query interface{}) Query {
 }
 
 func (c MongoCollection) Insert(docs ...interface{}) error {
-	return c.Collection.Insert(docs)
+	return c.Collection.Insert(docs...)
 }
 
 // MongoQuery wraps mgo.Query
