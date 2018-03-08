@@ -6,18 +6,21 @@ import (
 	"github.com/timhugh/ticket-engine/common"
 )
 
-const mongodb_uri string = "http://devbox:3000/tickets"
+const mongodb_uri string = "mongodb://devbox/tickets"
 
 func main() {
-	adapter := common.NewMongoAdapter(mongdb_uri, mongodb_db)
+	adapter, err := common.NewMongoAdapter(mongodb_uri)
+	if err != nil {
+		panic(err)
+	}
 	repo := common.LocationRepository{adapter}
 
-	storeLoc := Location{
+	storeLoc := common.Location{
 		ID:           "test_id",
 		SignatureKey: "test_signature",
 	}
 	repo.Store(storeLoc)
 
-	findLoc := repo.Find("test_id")
+	findLoc, _ := repo.Find("test_id")
 	fmt.Printf("Found location id '%s' with signature '%s'", findLoc.ID, findLoc.SignatureKey)
 }

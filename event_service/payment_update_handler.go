@@ -1,14 +1,12 @@
 package main
 
-import (
-	"github.com/timhugh/ticket-engine/common"
-)
+import ()
 
 type PaymentUpdateHandler struct {
 	orderCreator OrderCreator
 }
 
-func NewPaymentUpdateHandler(orderRepository common.OrderRepository) PaymentUpdateHandler {
+func NewPaymentUpdateHandler(orderRepository orderRepository) PaymentUpdateHandler {
 	return PaymentUpdateHandler{
 		OrderCreator{orderRepository},
 	}

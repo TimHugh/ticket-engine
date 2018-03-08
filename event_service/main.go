@@ -23,6 +23,7 @@ var config = map[string]string{
 	"newrelic_token": os.Getenv("NEW_RELIC_TOKEN"),
 	"newrelic_app":   os.Getenv("NEW_RELIC_APP_NAME"),
 	"rollbar_token":  os.Getenv("ROLLBAR_TOKEN"),
+	"mongodb_uri":    os.Getenv("MONGODB_URI"),
 }
 
 type RequestProcessor interface {
@@ -31,8 +32,12 @@ type RequestProcessor interface {
 }
 
 func main() {
-	orderRepository := common.NewInMemoryOrderRepository()
-	locationRepository := common.NewInMemoryLocationRepository()
+	adapter, err := common.NewMongoAdapter(config["mongodb_uri"])
+	if err != nil {
+		log.Fatal(err)
+	}
+	orderRepository := common.OrderRepository{adapter}
+	locationRepository := common.LocationRepository{adapter}
 
 	eventRouter := NewEventRouter()
 	eventRouter.Register("PAYMENT_UPDATED", NewPaymentUpdateHandler(orderRepository))
@@ -50,7 +55,7 @@ func main() {
 	n := negroni.Classic()
 	n.UseHandler(router)
 
-	err := http.ListenAndServe(fmt.Sprintf(":%s", config["port"]), n)
+	err = http.ListenAndServe(fmt.Sprintf(":%s", config["port"]), n)
 	if err != nil {
 		log.Fatal(err)
 	}

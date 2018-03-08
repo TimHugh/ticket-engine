@@ -40,11 +40,6 @@ func (q MockQuery) One(result interface{}) error {
 	return nil
 }
 
-type MockDocument struct {
-	ID    string
-	Value string
-}
-
 func TestAdapter(t *testing.T) {
 	session := MockSession{}
 	adapter := MongoAdapter{session}

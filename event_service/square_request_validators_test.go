@@ -21,12 +21,25 @@ func mockRequest(signature string, location_id string) SquareRequest {
 	}
 }
 
-func mockRepo() common.LocationRepository {
-	locationRepository := common.NewInMemoryLocationRepository()
-	locationRepository.Store(common.Location{
-		ID:           "location_id",
-		SignatureKey: "test_key",
-	})
+type mockLocationFinder struct {
+	Location *common.Location
+}
+
+func (m mockLocationFinder) Find(id string) (*common.Location, error) {
+	if m.Location.ID == id {
+		return m.Location, nil
+	} else {
+		return nil, fmt.Errorf("Unable to find location")
+	}
+}
+
+func mockRepo() locationFinder {
+	locationRepository := mockLocationFinder{
+		&common.Location{
+			ID:           "location_id",
+			SignatureKey: "test_key",
+		},
+	}
 	return locationRepository
 }
 

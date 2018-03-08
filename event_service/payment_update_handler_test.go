@@ -6,8 +6,21 @@ import (
 	"github.com/timhugh/ticket-engine/common"
 )
 
+type mockOrderRepository struct {
+	Order *common.Order
+}
+
+func (r mockOrderRepository) Find(id string) (*common.Order, error) {
+	return r.Order, nil
+}
+
+func (r *mockOrderRepository) Store(order common.Order) error {
+	r.Order = &order
+	return nil
+}
+
 func TestCreatesNewOrders(t *testing.T) {
-	orderRepo := common.NewInMemoryOrderRepository()
+	orderRepo := &mockOrderRepository{}
 	event := Event{
 		OrderID:    "order_id",
 		LocationID: "location_id",

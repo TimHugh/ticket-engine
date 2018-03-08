@@ -30,3 +30,8 @@ func (a *MockAdapter) Create(collection string, doc interface{}) error {
 }
 
 func (a *MockAdapter) Close() {}
+
+type MockDocument struct {
+	ID    string
+	Value string
+}

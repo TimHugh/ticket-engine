@@ -8,7 +8,12 @@ import (
 )
 
 type OrderCreator struct {
-	orderRepository common.OrderRepository
+	orderRepository orderRepository
+}
+
+type orderRepository interface {
+	Find(string) (*common.Order, error)
+	Store(common.Order) error
 }
 
 func (o OrderCreator) Create(orderID string, LocationID string) error {

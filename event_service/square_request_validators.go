@@ -18,7 +18,11 @@ type SquareRequest struct {
 }
 
 type SquareRequestValidator struct {
-	locationRepository common.LocationRepository
+	locationRepository locationFinder
+}
+
+type locationFinder interface {
+	Find(string) (*common.Location, error)
 }
 
 func (s SquareRequestValidator) Validate(req SquareRequest) error {
