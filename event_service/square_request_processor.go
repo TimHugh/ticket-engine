@@ -3,13 +3,15 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
 type RequestValidator interface {
-	Validate(SquareRequest) error
+	Validate(*SquareRequest) error
 }
 
 type SquareRequestProcessor struct {
@@ -29,14 +31,17 @@ func (proc *SquareRequestProcessor) AddValidator(validator RequestValidator) {
 }
 
 func (proc *SquareRequestProcessor) Process(r *http.Request) error {
-	squareRequest := proc.serializeRequest(r)
-	if err := proc.validate(squareRequest); err != nil {
+	squareRequest, err := proc.serializeRequest(r)
+	if err != nil {
+		return fmt.Errorf("Error processing request data: %s", err)
+	}
+	if err = proc.validate(squareRequest); err != nil {
 		return err
 	}
 	return proc.eventRouter.Dispatch(squareRequest.Event)
 }
 
-func (proc *SquareRequestProcessor) validate(req SquareRequest) error {
+func (proc *SquareRequestProcessor) validate(req *SquareRequest) error {
 	for _, validator := range proc.validators {
 		if err := validator.Validate(req); err != nil {
 			return err
@@ -45,22 +50,28 @@ func (proc *SquareRequestProcessor) validate(req SquareRequest) error {
 	return nil
 }
 
-func (proc *SquareRequestProcessor) parseEvent(body []byte) Event {
+func (proc *SquareRequestProcessor) parseEvent(body []byte) (Event, error) {
 	var event Event
-	json.Unmarshal(body, &event)
-	return event
+	err := json.Unmarshal(body, &event)
+	return event, err
 }
 
-func (proc *SquareRequestProcessor) serializeRequest(req *http.Request) SquareRequest {
+func (proc *SquareRequestProcessor) serializeRequest(req *http.Request) (*SquareRequest, error) {
 	buf := proc.cloneBody(req)
 	body, _ := ioutil.ReadAll(buf)
+	event, err := proc.parseEvent(body)
+	if err != nil {
+		return nil, err
+	}
 
-	return SquareRequest{
+	log.Printf("event=square_event_received location_id=%s event_type=%s entity_id=%s", event.LocationID, event.Type, event.OrderID)
+
+	return &SquareRequest{
 		URL:       "https://" + req.Host + req.URL.Path,
 		Body:      string(body),
 		Signature: req.Header.Get("X-Square-Signature"),
-		Event:     proc.parseEvent(body),
-	}
+		Event:     event,
+	}, nil
 }
 
 func (proc *SquareRequestProcessor) cloneBody(req *http.Request) io.ReadCloser {

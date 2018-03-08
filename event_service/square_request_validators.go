@@ -4,7 +4,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
-	"errors"
 	"fmt"
 
 	"github.com/timhugh/ticket-engine/common"
@@ -25,17 +24,16 @@ type locationFinder interface {
 	Find(string) (*common.Location, error)
 }
 
-func (s SquareRequestValidator) Validate(req SquareRequest) error {
+func (s SquareRequestValidator) Validate(req *SquareRequest) error {
 	location, err := s.locationRepository.Find(req.Event.LocationID)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error finding location '%s': %s", req.Event.LocationID, err)
 	}
-	if location == nil {
-		return errors.New(fmt.Sprintf("Received request for unknown location: %s.", req.Event.LocationID))
-	}
+
 	if !s.verifySignature(req.URL, location.SignatureKey, req.Body, req.Signature) {
-		return errors.New("Request failed signature validation")
+		return fmt.Errorf("Request failed signature validation")
 	}
+
 	return nil
 }
 

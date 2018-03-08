@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -34,7 +33,7 @@ func (e EventRouter) Register(event string, handler EventHandler) {
 func (e EventRouter) Dispatch(event Event) error {
 	handler, exists := e.routes[event.Type]
 	if !exists {
-		return errors.New(fmt.Sprintf("Recieved unknown event type '%s'", event.Type))
+		return fmt.Errorf("Recieved unknown event type '%s'", event.Type)
 	}
 	return handler.Handle(event)
 }

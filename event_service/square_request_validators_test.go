@@ -10,8 +10,8 @@ import (
 
 const goodSignature = "vsTe0jrY7ypjTdir98ES097hqN0="
 
-func mockRequest(signature string, location_id string) SquareRequest {
-	return SquareRequest{
+func mockRequest(signature string, location_id string) *SquareRequest {
+	return &SquareRequest{
 		Body:      `{"event": "test"}`,
 		Signature: signature,
 		URL:       "http://www.example.com/event",

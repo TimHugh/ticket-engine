@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/timhugh/ticket-engine/common"
@@ -17,9 +16,12 @@ type orderRepository interface {
 }
 
 func (o OrderCreator) Create(orderID string, LocationID string) error {
-	existingOrder, _ := o.orderRepository.Find(orderID)
+	existingOrder, err := o.orderRepository.Find(orderID)
+	if err != nil {
+		return fmt.Errorf("Error finding existing order: %s", err)
+	}
 	if existingOrder != nil {
-		return errors.New(fmt.Sprintf("Couldn't create duplicate order %s.", orderID))
+		return fmt.Errorf("Couldn't create duplicate order %s.", orderID)
 	}
 
 	return o.orderRepository.Store(common.Order{

@@ -94,8 +94,9 @@ func eventHandler(processor RequestProcessor) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, req *http.Request) {
 		if req.Method != "POST" {
-			unprocessable(w)
+			ok(w)
 		} else if err := processor.Process(req); err != nil {
+			log.Printf(`event=error message="%s"`, err)
 			rollbar.Error(rollbar.ERR, err)
 			unprocessable(w)
 		} else {
