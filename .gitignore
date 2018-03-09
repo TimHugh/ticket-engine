@@ -1,4 +1,4 @@
 .env
 .DS_Store
 
-event_service/event_service
+ticket_service
