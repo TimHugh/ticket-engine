@@ -34,6 +34,7 @@ type RequestProcessor interface {
 func main() {
 	adapter, err := common.NewMongoAdapter(config["mongodb_uri"])
 	if err != nil {
+		rollbar.Error(rollbar.ERR, err)
 		log.Fatal(err)
 	}
 	orderRepository := common.OrderRepository{Adapter: adapter}
@@ -58,6 +59,7 @@ func main() {
 	log.Printf("Starting server on port %s", config["port"])
 	err = http.ListenAndServe(fmt.Sprintf(":%s", config["port"]), n)
 	if err != nil {
+		rollbar.Error(rollbar.ERR, err)
 		log.Fatal(err)
 	}
 }
@@ -66,6 +68,7 @@ func initNewRelic(token string, appName string) newrelic.Application {
 	config := newrelic.NewConfig(appName, token)
 	app, err := newrelic.NewApplication(config)
 	if err != nil {
+		rollbar.Error(rollbar.ERR, err)
 		log.Fatal("Unable to initialize NewRelic reporting.")
 	}
 	log.Printf("Reporting to New Relic as '%s'", appName)
@@ -99,7 +102,7 @@ func requestHandler(processor RequestProcessor) http.HandlerFunc {
 			ok(w)
 		} else if err := processor.Process(req); err != nil {
 			log.Printf(`event=error message="%s"`, err)
-			rollbar.Error(rollbar.ERR, err)
+			rollbar.RequestError(rollbar.ERR, req, err)
 			unprocessable(w)
 		} else {
 			ok(w)
