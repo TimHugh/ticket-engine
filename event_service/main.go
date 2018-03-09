@@ -36,8 +36,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	orderRepository := common.OrderRepository{adapter}
-	locationRepository := common.LocationRepository{adapter}
+	orderRepository := common.OrderRepository{Adapter: adapter}
+	locationRepository := common.LocationRepository{Adapter: adapter}
 
 	eventRouter := NewEventRouter()
 	eventRouter.Register("PAYMENT_UPDATED", NewPaymentUpdateHandler(orderRepository))
