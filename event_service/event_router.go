@@ -7,7 +7,7 @@ import (
 type Event struct {
 	OrderID    string `json:"entity_id"`
 	Type       string `json:"event_type"`
-	LocationID string `json:"merchant_id"`
+	LocationID string `json:"location_id"`
 }
 
 type EventHandler interface {
