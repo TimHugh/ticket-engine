@@ -6,10 +6,10 @@ build:
 	go build
 
 test: build
-	go test
+	go test ./...
 
 coverage-test:
-	go test -coverprofile=coverage.out
+	go test -coverprofile=coverage.out ./...
 	go tool cover -func=coverage.out
 	go tool cover -html=coverage.out
 	rm coverage.out
