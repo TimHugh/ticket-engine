@@ -3,6 +3,8 @@ package main
 import (
 	"testing"
 
+	"fmt"
+
 	"github.com/timhugh/ticket_service/common"
 )
 
@@ -15,8 +17,12 @@ func (r mockOrderRepository) Find(id string) (*common.Order, error) {
 }
 
 func (r *mockOrderRepository) Store(order common.Order) error {
-	r.Order = &order
-	return nil
+	if r.Order == nil {
+		r.Order = &order
+		return nil
+	} else {
+		return fmt.Errorf("duplicate")
+	}
 }
 
 func TestCreatesNewOrders(t *testing.T) {
@@ -28,9 +34,13 @@ func TestCreatesNewOrders(t *testing.T) {
 
 	handler := NewPaymentUpdateHandler(orderRepo)
 
-	err := handler.Handle(event)
-	if err != nil {
-		t.Error("Expected to successfully create a new order.")
+	if err := handler.Handle(event); err != nil {
+		t.Errorf("Expected to create order without error but got %s", err)
+	}
+
+	// duplicate error check
+	if err := handler.Handle(event); err == nil {
+		t.Error("Expected to receive error for creating a duplicate order.")
 	}
 
 	order, err := orderRepo.Find("order_id")

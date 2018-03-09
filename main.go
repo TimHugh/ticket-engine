@@ -50,7 +50,7 @@ func main() {
 	nrApp := initNewRelic(config["newrelic_token"], config["newrelic_app"])
 
 	router := mux.NewRouter()
-	router.HandleFunc(newrelic.WrapHandleFunc(nrApp, "/event", eventHandler(requestProcessor)))
+	router.HandleFunc(newrelic.WrapHandleFunc(nrApp, "/event", requestHandler(requestProcessor)))
 
 	n := negroni.Classic()
 	n.UseHandler(router)
@@ -79,7 +79,7 @@ func initRollbar(token string, environment string) {
 
 type JSON map[string]string
 
-func eventHandler(processor RequestProcessor) http.HandlerFunc {
+func requestHandler(processor RequestProcessor) http.HandlerFunc {
 	r := render.New()
 
 	ok := func(w http.ResponseWriter) {
