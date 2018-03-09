@@ -2,36 +2,105 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/gorilla/mux"
+	"github.com/unrolled/render"
+	"github.com/urfave/negroni"
+
+	_ "github.com/joho/godotenv/autoload"
+	"github.com/newrelic/go-agent"
+	"github.com/stvp/rollbar"
 
 	"github.com/timhugh/ticket-engine/common"
 )
 
-const mongodb_uri string = "mongodb://devbox/tickets"
+var config = map[string]string{
+	"environment":    os.Getenv("ENVIRONMENT"),
+	"port":           os.Getenv("PORT"),
+	"newrelic_token": os.Getenv("NEW_RELIC_TOKEN"),
+	"newrelic_app":   os.Getenv("NEW_RELIC_APP_NAME"),
+	"rollbar_token":  os.Getenv("ROLLBAR_TOKEN"),
+	"mongodb_uri":    os.Getenv("MONGODB_URI"),
+}
+
+type RequestProcessor interface {
+	AddValidator(RequestValidator)
+	Process(*http.Request) error
+}
 
 func main() {
-	adapter, err := common.NewMongoAdapter(mongodb_uri)
-	check(err)
-	defer adapter.Close()
-
-	repo := common.LocationRepository{adapter}
-
-	storeLoc := common.Location{
-		ID:           "test_id",
-		SignatureKey: "test_signature",
+	adapter, err := common.NewMongoAdapter(config["mongodb_uri"])
+	if err != nil {
+		log.Fatal(err)
 	}
-	err = repo.Store(storeLoc)
-	check(err)
+	orderRepository := common.OrderRepository{Adapter: adapter}
+	locationRepository := common.LocationRepository{Adapter: adapter}
 
-	findLoc, findErr := repo.Find("test_id")
-	if findErr != nil {
-		panic(findErr)
-	} else {
-		fmt.Printf("Found location id '%s' with signature '%s'", findLoc.ID, findLoc.SignatureKey)
+	eventRouter := NewEventRouter()
+	eventRouter.Register("PAYMENT_UPDATED", NewPaymentUpdateHandler(orderRepository))
+
+	requestProcessor := NewSquareRequestProcessor(eventRouter)
+	requestProcessor.AddValidator(SquareRequestValidator{locationRepository})
+
+	initRollbar(config["rollbar_token"], config["environment"])
+
+	nrApp := initNewRelic(config["newrelic_token"], config["newrelic_app"])
+
+	router := mux.NewRouter()
+	router.HandleFunc(newrelic.WrapHandleFunc(nrApp, "/event", eventHandler(requestProcessor)))
+
+	n := negroni.Classic()
+	n.UseHandler(router)
+
+	err = http.ListenAndServe(fmt.Sprintf(":%s", config["port"]), n)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 
-func check(err error) {
+func initNewRelic(token string, appName string) newrelic.Application {
+	config := newrelic.NewConfig(appName, token)
+	app, err := newrelic.NewApplication(config)
 	if err != nil {
-		panic(err)
+		log.Fatal("Unable to initialize NewRelic reporting.")
+	}
+	return app
+}
+
+func initRollbar(token string, environment string) {
+	rollbar.Environment = environment
+	rollbar.Token = token
+}
+
+type JSON map[string]string
+
+func eventHandler(processor RequestProcessor) http.HandlerFunc {
+	r := render.New()
+
+	ok := func(w http.ResponseWriter) {
+		r.JSON(w, http.StatusOK, JSON{
+			"status": "OK",
+		})
+	}
+
+	unprocessable := func(w http.ResponseWriter) {
+		r.JSON(w, http.StatusUnprocessableEntity, JSON{
+			"error": "unable to process",
+		})
+	}
+
+	return func(w http.ResponseWriter, req *http.Request) {
+		if req.Method != "POST" {
+			ok(w)
+		} else if err := processor.Process(req); err != nil {
+			log.Printf(`event=error message="%s"`, err)
+			rollbar.Error(rollbar.ERR, err)
+			unprocessable(w)
+		} else {
+			ok(w)
+		}
 	}
 }
