@@ -55,6 +55,7 @@ func main() {
 	n := negroni.Classic()
 	n.UseHandler(router)
 
+	log.Printf("Starting server on port %s", config["port"])
 	err = http.ListenAndServe(fmt.Sprintf(":%s", config["port"]), n)
 	if err != nil {
 		log.Fatal(err)
@@ -67,6 +68,7 @@ func initNewRelic(token string, appName string) newrelic.Application {
 	if err != nil {
 		log.Fatal("Unable to initialize NewRelic reporting.")
 	}
+	log.Printf("Reporting to New Relic as '%s'", appName)
 	return app
 }
 
