@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/timhugh/ticket-engine/common"
+	"github.com/timhugh/ticket_service/common"
 )
 
 type OrderCreator struct {

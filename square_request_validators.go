@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/timhugh/ticket-engine/common"
+	"github.com/timhugh/ticket_service/common"
 )
 
 type SquareRequest struct {

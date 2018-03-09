@@ -14,7 +14,7 @@ import (
 	"github.com/newrelic/go-agent"
 	"github.com/stvp/rollbar"
 
-	"github.com/timhugh/ticket-engine/common"
+	"github.com/timhugh/ticket_service/common"
 )
 
 var config = map[string]string{

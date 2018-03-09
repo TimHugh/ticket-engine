@@ -5,7 +5,7 @@ import (
 
 	"fmt"
 
-	"github.com/timhugh/ticket-engine/common"
+	"github.com/timhugh/ticket_service/common"
 )
 
 const goodSignature = "vsTe0jrY7ypjTdir98ES097hqN0="
