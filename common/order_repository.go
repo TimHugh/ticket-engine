@@ -13,8 +13,11 @@ type OrderRepository struct {
 
 func (r OrderRepository) Find(id string) (*Order, error) {
 	var order Order
-	err := r.Adapter.Find("orders", id, &order)
-	return &order, err
+	if err := r.Adapter.Find("orders", id, &order); err == nil {
+		return &order, nil
+	} else {
+		return nil, err
+	}
 }
 
 func (r OrderRepository) Store(order Order) error {
