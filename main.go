@@ -42,6 +42,7 @@ func main() {
 
 	eventRouter := NewEventRouter()
 	eventRouter.Register("PAYMENT_UPDATED", NewPaymentUpdateHandler(orderRepository))
+	eventRouter.Register("TEST_NOTIFICATION", NoopHandler{})
 
 	requestProcessor := NewSquareRequestProcessor(eventRouter)
 	requestProcessor.AddValidator(SquareRequestValidator{locationRepository})

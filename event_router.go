@@ -14,6 +14,12 @@ type EventHandler interface {
 	Handle(event Event) error
 }
 
+type NoopHandler struct{}
+
+func (h NoopHandler) Handle(event Event) error {
+	return nil
+}
+
 type RouteList map[string]EventHandler
 
 type EventRouter struct {
