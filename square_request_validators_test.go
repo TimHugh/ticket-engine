@@ -50,7 +50,7 @@ func TestSignatureValidation(t *testing.T) {
 	request := mockRequest(goodSignature, "location_id")
 	err := validator.Validate(request)
 	if err != nil {
-		t.Errorf(fmt.Sprintf("Got unexpected error: %s", err.Error()))
+		t.Errorf("Got unexpected error: %s", err.Error())
 	}
 
 	// good location, bad signature
