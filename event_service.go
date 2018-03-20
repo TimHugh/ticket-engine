@@ -57,8 +57,6 @@ func main() {
 	n := negroni.Classic()
 	n.UseHandler(router)
 
-	log.Printf("Starting server on port %s", config["port"])
-	err = http.ListenAndServe(fmt.Sprintf(":%s", config["port"]), n)
 	if err != nil {
 		rollbar.Error(rollbar.ERR, err)
 		log.Fatal(err)

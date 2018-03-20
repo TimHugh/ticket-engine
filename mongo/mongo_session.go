@@ -1,43 +1,8 @@
-package common
+package mongo
 
 import (
 	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
-
-// MongoAdapter satisfies Adapter interface
-func NewMongoAdapter(host_uri string) (Adapter, error) {
-	session, err := NewMongoSession(host_uri)
-	return MongoAdapter{session}, err
-}
-
-type MongoAdapter struct {
-	session Session
-}
-
-func (m MongoAdapter) collection(name string) (Session, Collection) {
-	session := m.session.Clone()
-	collection := session.DB("").C(name)
-	return session, collection
-}
-
-func (m MongoAdapter) Find(collection_name string, id string, result interface{}) error {
-	session, collection := m.collection(collection_name)
-	defer session.Close()
-
-	return collection.Find(bson.M{"id": id}).One(result)
-}
-
-func (m MongoAdapter) Create(collection_name string, doc interface{}) error {
-	session, collection := m.collection(collection_name)
-	defer session.Close()
-
-	return collection.Insert(doc)
-}
-
-func (m MongoAdapter) Close() {
-	m.session.Close()
-}
 
 // MongoSession wraps mgo.Session
 type Session interface {
