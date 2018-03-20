@@ -8,13 +8,16 @@ import (
 
 	"github.com/timhugh/ticket_service/mongo"
 	"github.com/timhugh/ticket_service/rollbar"
+	"github.com/timhugh/ticket_service/root"
 )
 
 type ErrorReporter interface {
 	Error(error) error
 }
 
-type Logger interface{}
+type Logger interface {
+	Printf(string, ...interface{})
+}
 
 type Config map[string]string
 
@@ -24,6 +27,15 @@ type App struct {
 	Logger
 	OrderRepository
 	LocationRepository
+}
+
+type OrderRepository interface {
+	Find(string, string) (*root.Order, error)
+	Create(root.Order) error
+}
+
+type LocationRepository interface {
+	Find(string) (*root.Location, error)
 }
 
 func main() {
@@ -46,12 +58,12 @@ func main() {
 		Config:             config,
 		ErrorReporter:      rollbarReporter,
 		Logger:             logger,
-		OrderRepository:    OrderRepository{mongoSession},
-		LocationRepository: LocationRepository{mongoSession},
+		OrderRepository:    mongo.OrderRepository{mongoSession},
+		LocationRepository: mongo.LocationRepository{mongoSession},
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/event", NewEventHandler(app))
+	mux.Handle("/event", NewRouteHandler(app))
 
 	log.Printf("listening on %s\n", config["port"])
 	serveErr := http.ListenAndServe(fmt.Sprintf(":%s", config["port"]), mux)

@@ -3,25 +3,20 @@ package main
 import (
 	"fmt"
 
-	"github.com/timhugh/ticket_service/common"
+	"github.com/timhugh/ticket_service/root"
 )
 
 type OrderCreator struct {
-	orderRepository orderRepository
-}
-
-type orderRepository interface {
-	Find(string) (*common.Order, error)
-	Store(common.Order) error
+	OrderRepository
 }
 
 func (o OrderCreator) Create(orderID string, LocationID string) error {
-	existingOrder, _ := o.orderRepository.Find(orderID)
+	existingOrder, _ := o.OrderRepository.Find(LocationID, orderID)
 	if existingOrder != nil {
 		return fmt.Errorf("Couldn't create duplicate order %s.", orderID)
 	}
 
-	return o.orderRepository.Store(common.Order{
+	return o.OrderRepository.Create(root.Order{
 		ID:         orderID,
 		LocationID: LocationID,
 	})

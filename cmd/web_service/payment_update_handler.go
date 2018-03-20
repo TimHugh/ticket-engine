@@ -6,7 +6,7 @@ type PaymentUpdateHandler struct {
 	orderCreator OrderCreator
 }
 
-func NewPaymentUpdateHandler(orderRepository orderRepository) PaymentUpdateHandler {
+func NewPaymentUpdateHandler(orderRepository OrderRepository) PaymentUpdateHandler {
 	return PaymentUpdateHandler{
 		OrderCreator{orderRepository},
 	}

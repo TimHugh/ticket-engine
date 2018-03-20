@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/timhugh/ticket_service/common"
+	"github.com/timhugh/ticket_service/root"
 )
 
 type SquareRequest struct {
@@ -17,15 +17,15 @@ type SquareRequest struct {
 }
 
 type SquareRequestValidator struct {
-	locationRepository locationFinder
+	LocationRepository locationFinder
 }
 
 type locationFinder interface {
-	Find(string) (*common.Location, error)
+	Find(string) (*root.Location, error)
 }
 
 func (s SquareRequestValidator) Validate(req *SquareRequest) error {
-	location, err := s.locationRepository.Find(req.Event.LocationID)
+	location, err := s.LocationRepository.Find(req.Event.LocationID)
 	if err != nil {
 		return fmt.Errorf("Error finding location '%s': %s", req.Event.LocationID, err)
 	}

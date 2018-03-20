@@ -19,10 +19,16 @@ type SquareRequestProcessor struct {
 	eventRouter EventRouter
 }
 
-func NewSquareRequestProcessor(eventRouter EventRouter) RequestProcessor {
+func NewSquareRequestProcessor(app App) RequestProcessor {
+	router := NewEventRouter()
+	router.Register("PAYMENT_UPDATED", NewPaymentUpdateHandler(app.OrderRepository))
+	router.Register("TEST_NOTIFICATION", NoopHandler{})
+
 	return &SquareRequestProcessor{
-		validators:  []RequestValidator{},
-		eventRouter: eventRouter,
+		validators: []RequestValidator{
+			SquareRequestValidator{app.LocationRepository},
+		},
+		eventRouter: NewEventRouter(),
 	}
 }
 
