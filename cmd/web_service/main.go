@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -40,24 +41,23 @@ type LocationRepository interface {
 
 func main() {
 	config := Config{
-		"environment":    os.Getenv("ENVIRONMENT"),
-		"port":           os.Getenv("PORT"),
-		"newrelic_token": os.Getenv("NEW_RELIC_TOKEN"),
-		"newrelic_app":   os.Getenv("NEW_RELIC_APP_NAME"),
-		"rollbar_token":  os.Getenv("ROLLBAR_TOKEN"),
-		"mongodb_uri":    os.Getenv("MONGODB_URI"),
+		"environment":    *flag.String("env", "development", "application environment"),
+		"http":           *flag.String("http", ":8080", "HTTP service address"),
+		"newrelic_token": *flag.String("new_relic_token", "", "New Relic API token"),
+		"newrelic_app":   *flag.String("new_relic_app", "", "New Relic application name"),
+		"rollbar_token":  *flag.String("rollbar_token", "", "Rollbar API token"),
+		"mongodb_uri":    *flag.String("mongodb", "", "MongoDB host URI"),
 	}
 
-	logger := log.New(os.Stdout, "web", log.LstdFlags)
-	rollbarReporter := rollbar.New(config["rollbar_token"], config["environment"])
+	log.Printf("running with %s environment config\n", config["environment"])
 
 	mongoSession, mongoErr := mongo.NewMongoSession(config["mongodb_uri"])
 	fail(mongoErr)
 
 	app := App{
 		Config:             config,
-		ErrorReporter:      rollbarReporter,
-		Logger:             logger,
+		ErrorReporter:      rollbar.New(config["rollbar_token"], config["environment"]),
+		Logger:             log.New(os.Stdout, "web", log.LstdFlags),
 		OrderRepository:    mongo.OrderRepository{mongoSession},
 		LocationRepository: mongo.LocationRepository{mongoSession},
 	}
