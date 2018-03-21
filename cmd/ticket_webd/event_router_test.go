@@ -48,3 +48,11 @@ func TestRouting(t *testing.T) {
 		t.Error("Expected to receive error from handler")
 	}
 }
+
+func TestNoop(t *testing.T) {
+	h := NoopHandler{}
+	var event Event
+	if err := h.Handle(event); err != nil {
+		t.Errorf("expected nil error but got %s", err)
+	}
+}

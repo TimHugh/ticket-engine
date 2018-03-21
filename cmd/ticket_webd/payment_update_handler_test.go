@@ -25,11 +25,11 @@ func TestCreatesNewOrders(t *testing.T) {
 		LocationID: "id",
 	}
 
-	if r.CreateInvoked != true {
-		t.Errorf("expected repository create method to be invoked")
-	}
 	if err := h.Handle(event); err != nil {
 		t.Errorf("expected to create order without error but got %s", err)
+	}
+	if r.CreateInvoked != true {
+		t.Errorf("expected repository create method to be invoked")
 	}
 }
 
