@@ -25,8 +25,11 @@ func TestCreatesNewOrders(t *testing.T) {
 		LocationID: "id",
 	}
 
+	//	if r.CreateInvoked != true {
+	//		t.Errorf("expected repository create method to be invoked")
+	//	}
 	if err := h.Handle(event); err != nil {
-		t.Errorf("Expected to create order without error but got %s", err)
+		t.Errorf("expected to create order without error but got %s", err)
 	}
 }
 
@@ -44,6 +47,6 @@ func TestDoesNotCreateDuplicates(t *testing.T) {
 	}
 
 	if err := h.Handle(event); err == nil {
-		t.Error("Expected to receive error for creating a duplicate order.")
+		t.Error("expected to receive error for creating a duplicate order")
 	}
 }
