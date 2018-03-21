@@ -21,7 +21,7 @@ type SquareRequestProcessor struct {
 
 func NewSquareRequestProcessor(app App) RequestProcessor {
 	router := NewEventRouter()
-	router.Register("PAYMENT_UPDATED", NewPaymentUpdateHandler(app.OrderRepository))
+	router.Register("PAYMENT_UPDATED", PaymentUpdateHandler{app.OrderRepository})
 	router.Register("TEST_NOTIFICATION", NoopHandler{})
 
 	return &SquareRequestProcessor{

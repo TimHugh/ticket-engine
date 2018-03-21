@@ -11,7 +11,7 @@ import (
 
 func TestCreatesNewOrders(t *testing.T) {
 	r := &mock.OrderRepository{}
-	h := NewPaymentUpdateHandler(r)
+	h := PaymentUpdateHandler{r}
 
 	r.FindFn = func(locationID, id string) (*root.Order, error) {
 		return nil, fmt.Errorf("not found")
@@ -25,9 +25,9 @@ func TestCreatesNewOrders(t *testing.T) {
 		LocationID: "id",
 	}
 
-	//	if r.CreateInvoked != true {
-	//		t.Errorf("expected repository create method to be invoked")
-	//	}
+	if r.CreateInvoked != true {
+		t.Errorf("expected repository create method to be invoked")
+	}
 	if err := h.Handle(event); err != nil {
 		t.Errorf("expected to create order without error but got %s", err)
 	}
@@ -35,7 +35,7 @@ func TestCreatesNewOrders(t *testing.T) {
 
 func TestDoesNotCreateDuplicates(t *testing.T) {
 	r := &mock.OrderRepository{}
-	h := NewPaymentUpdateHandler(r)
+	h := PaymentUpdateHandler{r}
 
 	r.FindFn = func(locationID, id string) (*root.Order, error) {
 		return &root.Order{}, nil

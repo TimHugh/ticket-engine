@@ -1,17 +1,23 @@
 package main
 
-import ()
+import (
+	"fmt"
+
+	"github.com/timhugh/ticket_service/root"
+)
 
 type PaymentUpdateHandler struct {
-	orderCreator OrderCreator
-}
-
-func NewPaymentUpdateHandler(orderRepository OrderRepository) PaymentUpdateHandler {
-	return PaymentUpdateHandler{
-		OrderCreator{orderRepository},
-	}
+	OrderRepository OrderRepository
 }
 
 func (p PaymentUpdateHandler) Handle(event Event) error {
-	return p.orderCreator.Create(event.OrderID, event.LocationID)
+	existingOrder, _ := p.OrderRepository.Find(event.LocationID, event.OrderID)
+	if existingOrder != nil {
+		return fmt.Errorf("Couldn't create duplicate order %s.", event.OrderID)
+	}
+
+	return p.OrderRepository.Create(root.Order{
+		ID:         event.OrderID,
+		LocationID: event.LocationID,
+	})
 }
