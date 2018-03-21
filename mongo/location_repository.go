@@ -27,7 +27,7 @@ func (s LocationRepository) Find(id string) (*root.Location, error) {
 	session, collection := s.collection()
 	defer session.Close()
 
-	var location *root.Location
+	location := &root.Location{}
 	err := collection.Find(bson.M{"id": id}).One(location)
 	return location, err
 }

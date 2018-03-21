@@ -27,7 +27,7 @@ func (s OrderRepository) Find(id string, locationID string) (*root.Order, error)
 	session, collection := s.collection()
 	defer session.Close()
 
-	var order *root.Order
+	order := &root.Order{}
 	err := collection.Find(bson.M{"id": id, "location_id": locationID}).One(order)
 	return order, err
 }
