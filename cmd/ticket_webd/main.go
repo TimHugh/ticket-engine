@@ -58,8 +58,8 @@ func main() {
 		Config:             config,
 		ErrorReporter:      rollbar.New(config["rollbar_token"], config["environment"]),
 		Logger:             log.New(os.Stdout, "web", log.LstdFlags),
-		OrderRepository:    mongo.OrderRepository{mongoSession},
-		LocationRepository: mongo.LocationRepository{mongoSession},
+		OrderRepository:    mongo.OrderRepository{Session: mongoSession},
+		LocationRepository: mongo.LocationRepository{Session: mongoSession},
 	}
 
 	mux := http.NewServeMux()
