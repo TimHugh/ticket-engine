@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/timhugh/ticket_service/root"
+	root "github.com/timhugh/ticket_service"
 )
 
 type PaymentUpdateHandler struct {

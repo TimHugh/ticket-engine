@@ -3,7 +3,7 @@ package mongo
 import (
 	"gopkg.in/mgo.v2/bson"
 
-	"github.com/timhugh/ticket_service/root"
+	root "github.com/timhugh/ticket_service"
 )
 
 type LocationRepository struct {

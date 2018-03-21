@@ -5,8 +5,8 @@ import (
 
 	"fmt"
 
+	root "github.com/timhugh/ticket_service"
 	"github.com/timhugh/ticket_service/mock"
-	"github.com/timhugh/ticket_service/root"
 )
 
 func TestCreatesNewOrders(t *testing.T) {

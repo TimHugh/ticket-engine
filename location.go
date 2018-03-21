@@ -1,4 +1,4 @@
-package root
+package ticket_service
 
 type Location struct {
 	ID           string

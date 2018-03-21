@@ -1,4 +1,4 @@
-package root
+package ticket_service
 
 type OrderRepository interface {
 	Create(Order) error

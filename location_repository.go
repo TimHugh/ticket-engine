@@ -1,4 +1,4 @@
-package root
+package ticket_service
 
 type LocationRepository interface {
 	Create(Location) error

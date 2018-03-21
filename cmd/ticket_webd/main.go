@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 
+	root "github.com/timhugh/ticket_service"
 	"github.com/timhugh/ticket_service/mongo"
 	"github.com/timhugh/ticket_service/rollbar"
-	"github.com/timhugh/ticket_service/root"
 )
 
 type ErrorReporter interface {

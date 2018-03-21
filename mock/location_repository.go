@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"github.com/timhugh/ticket_service/root"
+	root "github.com/timhugh/ticket_service"
 )
 
 type LocationRepository struct {
