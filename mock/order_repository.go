@@ -4,6 +4,8 @@ import (
 	root "github.com/timhugh/ticket_service"
 )
 
+var _ root.OrderRepository = &OrderRepository{}
+
 type OrderRepository struct {
 	FindFn      func(string, string) (*root.Order, error)
 	FindInvoked bool

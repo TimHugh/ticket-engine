@@ -4,6 +4,8 @@ import (
 	root "github.com/timhugh/ticket_service"
 )
 
+var _ root.LocationRepository = &LocationRepository{}
+
 type LocationRepository struct {
 	FindFn      func(string) (*root.Location, error)
 	FindInvoked bool

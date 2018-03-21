@@ -6,6 +6,8 @@ import (
 	root "github.com/timhugh/ticket_service"
 )
 
+var _ root.OrderRepository = OrderRepository{}
+
 type OrderRepository struct {
 	Session Session
 }
