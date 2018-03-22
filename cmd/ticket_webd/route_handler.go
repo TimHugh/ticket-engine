@@ -40,7 +40,7 @@ func (h RouteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ok(w)
 	} else if err := h.Processor.Process(r); err != nil {
 		h.App.Logger.Printf(`event=error message="%s"`, err)
-		h.App.ErrorReporter.Error(err)
+		h.App.Report.Error(err)
 		unprocessable(w)
 	} else {
 		ok(w)

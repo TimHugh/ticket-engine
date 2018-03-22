@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -15,6 +14,8 @@ type RequestValidator interface {
 }
 
 type SquareRequestProcessor struct {
+	App App
+
 	validators  []RequestValidator
 	eventRouter EventRouter
 }
@@ -25,10 +26,11 @@ func NewSquareRequestProcessor(app App) RequestProcessor {
 	router.Register("TEST_NOTIFICATION", NoopHandler{})
 
 	return &SquareRequestProcessor{
+		App: app,
 		validators: []RequestValidator{
 			SquareRequestValidator{app.LocationRepository},
 		},
-		eventRouter: NewEventRouter(),
+		eventRouter: router,
 	}
 }
 
@@ -70,7 +72,7 @@ func (proc *SquareRequestProcessor) serializeRequest(req *http.Request) (*Square
 		return nil, err
 	}
 
-	log.Printf("event=square_event_received location_id=%s event_type=%s entity_id=%s", event.LocationID, event.Type, event.OrderID)
+	proc.App.Logger.Printf("event=square_event_received location_id=%s event_type=%s entity_id=%s", event.LocationID, event.Type, event.OrderID)
 
 	return &SquareRequest{
 		URL:       "https://" + req.Host + req.URL.Path,
