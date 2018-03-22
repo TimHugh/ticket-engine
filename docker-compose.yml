@@ -5,10 +5,15 @@ volumes:
 
 services:
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        app: ticket_webd
     env_file: .env
     ports:
       - "80:8080"
+
   mongo:
     image: mongo
     ports:

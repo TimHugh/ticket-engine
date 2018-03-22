@@ -1,0 +1,11 @@
+vendors:
+- path: github.com/namsral/flag
+  rev: 67f268f20922975c067ed799e4be6bacf152208c
+- path: github.com/stvp/roll
+  rev: 3627a5cbeaeaa68023abd02bb8687925265f2f63
+- path: gopkg.in/check.v1
+  rev: 20d25e2804050c1cd24a7eea1e7a6447dd0e74ec
+- path: gopkg.in/mgo.v2
+  rev: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+- path: gopkg.in/yaml.v2
+  rev: 7f97868eec74b32b0982dd158a51a446d1da7eb5

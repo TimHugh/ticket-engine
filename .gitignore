@@ -1,4 +1,5 @@
 .env
 .DS_Store
 
-ticket_service
+cmd/web_service/web_service
+cmd/worker_service/worker_service
