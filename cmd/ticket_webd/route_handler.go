@@ -6,7 +6,7 @@ import (
 )
 
 type RouteHandler struct {
-	App App
+	App AppContext
 
 	Processor RequestProcessor
 }
@@ -15,7 +15,7 @@ type RequestProcessor interface {
 	Process(*http.Request) error
 }
 
-func NewRouteHandler(app App) RouteHandler {
+func NewRouteHandler(app AppContext) RouteHandler {
 	processor := NewSquareRequestProcessor(app)
 	return RouteHandler{
 		App:       app,

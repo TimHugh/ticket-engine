@@ -18,7 +18,7 @@ type Logger interface {
 	Printf(string, ...interface{})
 }
 
-type App struct {
+type AppContext struct {
 	Config             Config
 	Report             ErrorReporter
 	Logger             Logger
@@ -36,7 +36,7 @@ type LocationRepository interface {
 }
 
 func main() {
-	app := App{}
+	app := AppContext{}
 
 	app.Logger = log.New(os.Stdout, "web", log.LstdFlags)
 

@@ -14,13 +14,13 @@ type RequestValidator interface {
 }
 
 type SquareRequestProcessor struct {
-	App App
+	App AppContext
 
 	validators  []RequestValidator
 	eventRouter EventRouter
 }
 
-func NewSquareRequestProcessor(app App) RequestProcessor {
+func NewSquareRequestProcessor(app AppContext) RequestProcessor {
 	router := NewEventRouter()
 	router.Register("PAYMENT_UPDATED", PaymentUpdateHandler{app.OrderRepository})
 	router.Register("TEST_NOTIFICATION", NoopHandler{})
