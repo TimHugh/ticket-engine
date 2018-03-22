@@ -19,11 +19,11 @@ type Logger interface {
 }
 
 type App struct {
-	Config
-	ErrorReporter
-	Logger
-	OrderRepository
-	LocationRepository
+	Config             Config
+	Report             ErrorReporter
+	Logger             Logger
+	OrderRepository    OrderRepository
+	LocationRepository LocationRepository
 }
 
 type OrderRepository interface {
@@ -36,27 +36,25 @@ type LocationRepository interface {
 }
 
 func main() {
-	config := Config{}
-	config.Load()
+	app := App{}
 
-	log.Printf("running with %s environment config\n", config.Get("environment"))
+	app.Logger = log.New(os.Stdout, "web", log.LstdFlags)
 
-	mongoSession, mongoErr := mongo.NewMongoSession(config.Get("mongodb_uri"))
+	app.Config = Config{}
+	app.Config.Load()
+
+	app.Report = rollbar.New(app.Config.Get("rollbar_token"), app.Config.Get("environment"))
+
+	mongoSession, mongoErr := mongo.NewMongoSession(app.Config.Get("mongodb_uri"))
 	fail(mongoErr)
-
-	app := App{
-		Config:             config,
-		ErrorReporter:      rollbar.New(config.Get("rollbar_token"), config.Get("environment")),
-		Logger:             log.New(os.Stdout, "web", log.LstdFlags),
-		OrderRepository:    mongo.OrderRepository{Session: mongoSession},
-		LocationRepository: mongo.LocationRepository{Session: mongoSession},
-	}
+	app.OrderRepository = mongo.OrderRepository{Session: mongoSession}
+	app.LocationRepository = mongo.LocationRepository{Session: mongoSession}
 
 	mux := http.NewServeMux()
 	mux.Handle("/event", NewRouteHandler(app))
 
-	log.Printf("listening on %s\n", config.Get("http"))
-	serveErr := http.ListenAndServe(config.Get("http"), mux)
+	app.Logger.Printf("listening on %s\n", app.Config.Get("http"))
+	serveErr := http.ListenAndServe(app.Config.Get("http"), mux)
 	fail(serveErr)
 }
 
