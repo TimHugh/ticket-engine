@@ -20,17 +20,11 @@ type Logger interface {
 }
 
 type AppContext struct {
-	Config             Config
+	Config             *config.Config
 	Report             ErrorReporter
 	Logger             Logger
 	OrderRepository    OrderRepository
 	LocationRepository LocationRepository
-}
-
-type Config interface {
-	Get(string) string
-	Define(string, string, string)
-	Load()
 }
 
 type OrderRepository interface {
@@ -43,7 +37,7 @@ type LocationRepository interface {
 }
 
 func main() {
-	app := AppContext{}
+	var app AppContext
 
 	app.Logger = log.New(os.Stdout, "", 0)
 

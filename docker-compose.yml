@@ -4,6 +4,7 @@ volumes:
   mongodata:
 
 services:
+
   web:
     build:
       context: .
@@ -13,6 +14,20 @@ services:
     env_file: .env
     ports:
       - "80:8080"
+    depends_on:
+      - rabbit
+      - mongo
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        app: ticket_workerd
+    env_file: .env
+    depends_on:
+      - rabbit
+      - mongo
 
   mongo:
     image: mongo
@@ -20,3 +35,15 @@ services:
       - "27017:27017"
     volumes:
       - "mongodata:/data/db"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+    environment:
+      - "RABBITMQ_DEFAULT_USER=guest"
+      - "RABBITMQ_DEFAULT_PASS=guest"
+    healthcheck:
+      test: "rabbitmqctl status"

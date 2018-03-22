@@ -4,7 +4,7 @@ import (
 	"github.com/namsral/flag"
 )
 
-type config struct {
+type Config struct {
 	store map[string]*ConfigEntry
 }
 
@@ -15,20 +15,20 @@ type ConfigEntry struct {
 	Value        *string
 }
 
-func New() *config {
-	return &config{
+func New() *Config {
+	return &Config{
 		make(map[string]*ConfigEntry),
 	}
 }
 
-func (c *config) Load() {
+func (c *Config) Load() {
 	for _, entry := range c.store {
 		entry.Value = flag.String(entry.Name, entry.DefaultValue, entry.Description)
 	}
 	flag.Parse()
 }
 
-func (c *config) Get(name string) string {
+func (c *Config) Get(name string) string {
 	entry, ok := c.store[name]
 	if !ok {
 		return ""
@@ -36,7 +36,7 @@ func (c *config) Get(name string) string {
 	return *entry.Value
 }
 
-func (c *config) Define(name string, defaultValue string, description string) {
+func (c *Config) Define(name string, defaultValue string, description string) {
 	c.store[name] = &ConfigEntry{
 		Name:         name,
 		DefaultValue: defaultValue,
