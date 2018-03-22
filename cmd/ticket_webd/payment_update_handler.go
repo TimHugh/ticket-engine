@@ -11,10 +11,8 @@ type PaymentUpdateHandler struct {
 }
 
 func (p PaymentUpdateHandler) Handle(event Event) error {
-	_, err := p.OrderRepository.Find(event.LocationID, event.OrderID)
-	if err.Error() != "not found" {
-		return err
-	} else if err != nil {
+	existingOrder, _ := p.OrderRepository.Find(event.LocationID, event.OrderID)
+	if existingOrder != nil {
 		return fmt.Errorf("Couldn't create duplicate order %s.", event.OrderID)
 	}
 
