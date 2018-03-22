@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/namsral/flag"
 )
 
@@ -20,10 +18,6 @@ func (c *Config) Load() {
 		"mongodb_uri":    flag.String("mongodb_uri", "", "MongoDB host URI"),
 	}
 	flag.Parse()
-
-	for name, val := range c.store {
-		fmt.Printf("%s: %s\n", name, *val)
-	}
 }
 
 func (c *Config) Get(name string) string {
