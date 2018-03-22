@@ -1,6 +1,8 @@
 package rollbar
 
 import (
+	"fmt"
+
 	"github.com/stvp/roll"
 )
 
@@ -14,8 +16,10 @@ func New(token, env string) Reporter {
 	}
 }
 
-func (r Reporter) Error(err error) error {
+func (r Reporter) Error(err error) {
 	var emptyCustom map[string]string
 	_, reportErr := r.Client.Error(err, emptyCustom)
-	return reportErr
+	if reportErr != nil {
+		fmt.Printf("ERROR: Unable to report error to rollbar!\nOriginal Error: %s\nRollbar error: %s", err, reportErr)
+	}
 }

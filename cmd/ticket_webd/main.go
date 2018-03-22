@@ -12,7 +12,7 @@ import (
 )
 
 type ErrorReporter interface {
-	Error(error) error
+	Error(error)
 }
 
 type Logger interface {
