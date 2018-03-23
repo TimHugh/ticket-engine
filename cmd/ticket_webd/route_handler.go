@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -36,8 +37,17 @@ func (h RouteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, `{"error": "unable to process"}`)
 	}
 
+	notfound := func(w http.ResponseWriter) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Header().Set("Content-Type", "application/json")
+		io.WriteString(w, `{"error": "not found"}`)
+	}
+
 	if r.Method != "POST" {
-		ok(w)
+		err := fmt.Errorf("route does not exist: %s %s", r.Method, r.URL.Path)
+		h.App.Logger.Printf(`event=error message="%s"`, err)
+		h.App.Report.Error(err)
+		notfound(w)
 	} else if err := h.Processor.Process(r); err != nil {
 		h.App.Logger.Printf(`event=error message="%s"`, err)
 		h.App.Report.Error(err)
